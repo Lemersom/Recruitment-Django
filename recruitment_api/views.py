@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
+from django.db import transaction
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -9,6 +10,43 @@ from .models import PersonalInformation, Contact, ProfessionalExperience, Academ
 from .serializers import PersonalInformationSerializer, ContactSerializer, ProfessionalExperienceSerializer, AcademicBackgroundSerializer
 
 import json
+
+
+### Complete Profile ###
+@api_view(['POST'])
+def completeProfile_manager(request):
+    try:
+        with transaction.atomic():
+            # Personal Information
+            personal_serializer = PersonalInformationSerializer(data=request.data.get('personal_information'))
+            if personal_serializer.is_valid(raise_exception=True):
+                personal_info_instance = personal_serializer.save()
+
+            # Contact
+            contact_data = request.data.get('contact', {})
+            contact_data['personal_information'] = personal_info_instance.id
+            contact_serializer = ContactSerializer(data=contact_data)
+            if contact_serializer.is_valid(raise_exception=True):
+                contact_serializer.save()
+
+            # Professional Experience
+            experience_data = request.data.get('professional_experience', {})
+            experience_data['personal_information'] = personal_info_instance.id
+            experience_serializer = ProfessionalExperienceSerializer(data=experience_data)
+            if experience_serializer.is_valid(raise_exception=True):
+                experience_serializer.save()
+
+            # Academic Background
+            academic_data = request.data.get('academic_background', {})
+            academic_data['personal_information'] = personal_info_instance.id
+            academic_serializer = AcademicBackgroundSerializer(data=academic_data)
+            if academic_serializer.is_valid(raise_exception=True):
+                academic_serializer.save()
+
+        return Response({"message": "Profile created successfully."}, status=status.HTTP_201_CREATED)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
 
 ### Personal Information ###
 @api_view(['GET','POST','PUT','DELETE'])

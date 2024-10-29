@@ -4,6 +4,7 @@ from django.urls import path, include
 from . import views
 
 urlpatterns = [
+    path('profile/', views.completeProfile_manager, name='completeProfile_manager'),
     path('information/', views.personalInformation_manager, name='personalInformation_manager'),
     path('information/<int:requestedId>', views.personalInformation_manager, name='personalInformation_manager_parameter'),
     path('contact/', views.contact_manager, name='contact_manager'),

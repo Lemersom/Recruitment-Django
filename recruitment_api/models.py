@@ -27,10 +27,10 @@ class ProfessionalExperience(models.Model):
     company = models.CharField(max_length=100)
     start_date = models.DateField()
     end_date = models.DateField(blank=True, null=True)
-    description = models.TextField(default='')
+    description = models.TextField(default='', blank=True, null=True)
 
     def __str__(self):
-        return f"{self.job_title} at {self.company}"
+        return f"{self.job_title} at {self.company} - {self.personal_information}"
 
 
 class AcademicBackground(models.Model):
@@ -41,4 +41,4 @@ class AcademicBackground(models.Model):
     end_date = models.DateField(blank=True, null=True)
 
     def __str__(self):
-        return f"{self.degree} from {self.institution}"
+        return f"{self.degree} from {self.institution} - {self.personal_information}"
